@@ -4,6 +4,10 @@ import com.phonebook.dao.CompanyDao;
 import com.phonebook.dao.UserDao;
 import com.phonebook.model.Company;
 import com.phonebook.model.User;
+import com.phonebook.service.CompanyService;
+import com.phonebook.service.UserService;
+import com.phonebook.service.impl.CompanyServiceImpl;
+import com.phonebook.service.impl.UserServiceImpl;
 import com.phonebook.util.JdbcUtil;
 
 import java.sql.Connection;
@@ -16,89 +20,74 @@ public class Main {
         try (Connection connection = JdbcUtil.getConnection()) {
             // Users
             UserDao userDao = new UserDao(connection);
+            UserService userService = new UserServiceImpl(userDao);
 
-            User newUser = User.builder()
-                    .firstName("Max")
-                    .lastName("Shell")
-                    .phoneNumber("123-123-1234")
-                    .build();
+            // Build user
+            User newUser = UserService.buildUser("Max", "Shell", "123-123-1234");
+            User newUser2 = UserService.buildUser("Levi", "Muller", "988-777-6666");
 
-            User newUser2 = User.builder()
-                    .firstName("Levi")
-                    .lastName("Muller")
-                    .phoneNumber("988-777-6666")
-                    .build();
+            // Create user
+            userService.createUser(newUser);
+            userService.createUser(newUser2);
 
-            userDao.createUser(newUser);
-            userDao.createUser(newUser2);
-
-            User retrievedUser = userDao.getUserById(3);
+            // Get user
+            User retrievedUser = userService.getUserById(3);
             System.out.println("Retrieved user: " + retrievedUser);
 
-            User retrievedUser2 = userDao.getUserById(4);
+            User retrievedUser2 = userService.getUserById(4);
             System.out.println("Retrieved user: " + retrievedUser2);
 
-            List<User> allUsers = userDao.getAllUsers();
-            System.out.println("All users: ");
-            for (User user : allUsers) {
-                System.out.println(user);
-            }
+            // Get users
+            List<User> allUsers = userService.getAllUsers();
+            userService.displayUsers(allUsers);
 
+            // Update user
             retrievedUser.setPhoneNumber("555-999-8888");
-            userDao.updateUser(retrievedUser);
+            userService.updateUser(retrievedUser);
             System.out.println("Updated user: " + retrievedUser);
 
+            // Delete user
             int userIdToDelete = 4;
-            userDao.deleteUser(userIdToDelete);
+            userService.deleteUser(userIdToDelete);
             System.out.println("Deleted user with ID " + userIdToDelete);
 
-            System.out.println("All users: ");
-            for (User user : userDao.getAllUsers()) {
-                System.out.println(user);
-            }
+            userService.displayUsers(userService.getAllUsers());
 
+            // ---------
             // Companies
             CompanyDao companyDao = new CompanyDao(connection);
+            CompanyService companyService = new CompanyServiceImpl(companyDao);
 
-            Company newCompany = Company.builder()
-                    .name("Example Corp")
-                    .address("23 Main St")
-                    .phoneNumber("555-123-4567")
-                    .build();
+            // Build company
+            Company newCompany = CompanyService.buildCompany("Example Corp", "23 Main St", "555-123-4567");
+            Company newCompany2 = CompanyService.buildCompany("Example Corp test 2", "67 Main St", "666-123-9876");
 
-            Company newCompany2 = Company.builder()
-                    .name("Example Corp test 2")
-                    .address("67 Main St")
-                    .phoneNumber("666-123-9876")
-                    .build();
+            // Create company
+            companyService.createCompany(newCompany);
+            companyService.createCompany(newCompany2);
 
-            companyDao.createCompany(newCompany);
-            companyDao.createCompany(newCompany2);
-
-            Company retrievedCompany = companyDao.getCompanyById(3);
+            // Get Company
+            Company retrievedCompany = companyService.getCompanyById(3);
             System.out.println("Retrieved company: " + retrievedCompany);
 
-            Company retrievedCompany2 = companyDao.getCompanyById(4);
+            Company retrievedCompany2 = companyService.getCompanyById(4);
             System.out.println("Retrieved company: " + retrievedCompany2);
 
-            List<Company> allCompanies = companyDao.getAllCompanies();
-            System.out.println("All companies: ");
-            for (Company company : allCompanies) {
-                System.out.println(company);
-            }
+            // Get companies
+            List<Company> allCompanies = companyService.getAllCompanies();
+            companyService.displayCompanies(companyService.getAllCompanies());
 
+            // Update company
             retrievedCompany.setPhoneNumber("555-999-8888");
-            companyDao.updateCompany(retrievedCompany);
+            companyService.updateCompany(retrievedCompany);
             System.out.println("Updated company: " + retrievedCompany);
 
+            // Delete company
             int companyIdToDelete = 4;
-            companyDao.deleteCompany(companyIdToDelete);
+            companyService.deleteCompany(companyIdToDelete);
             System.out.println("Deleted company with ID " + companyIdToDelete);
 
-            System.out.println("All companies: ");
-            for (Company company : companyDao.getAllCompanies()) {
-                System.out.println(company);
-            }
+            companyService.displayCompanies(companyService.getAllCompanies());
 
         } catch (Exception e) {
             System.out.println(e);
