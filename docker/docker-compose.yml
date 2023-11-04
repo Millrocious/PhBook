@@ -1,16 +1,18 @@
 version: "3.8"
 services:
-  postgres_phonebook:
+  postgres-phonebook:
     image: postgres:latest
     restart: always
+    container_name: postgres-phonebook
     environment:
       POSTGRES_PASSWORD: postgres
       POSTGRES_USER: postgres
+      POSTGRES_DB: db_phonebook
     ports:
-      - '5432:5432'
+      - '5433:5432'
     volumes:
-      - db:/var/lib/postgresql/data
+      - db_phonebook:/var/lib/postgresql/data
 
 volumes:
-  db:
+  db_phonebook:
     driver: local

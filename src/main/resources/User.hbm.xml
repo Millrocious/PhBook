@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<hibernate-mapping>
+    <class name="com.phonebook.entity.User" table="users">
+        <id name="id" type="int" column="id"><generator class="native"/></id>
+        <property name="firstName" type="string" column="first_name" not-null="true"/>
+        <property name="lastName" type="string" column="last_name" not-null="true"/>
+        <property name="phoneNumber" type="string" column="phone_number" not-null="true" unique="true"/>
+
+        <many-to-one name="company" class="com.phonebook.entity.Company" column="company_id" not-null="true"/>
+    </class>
+</hibernate-mapping>

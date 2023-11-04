@@ -1,46 +1,49 @@
 package com.phonebook.service.impl;
 
-import com.phonebook.dao.UserDao;
-import com.phonebook.model.User;
+import com.phonebook.entity.User;
 import com.phonebook.service.UserService;
-import lombok.RequiredArgsConstructor;
+import com.phonebook.util.HibernateUtil;
+import org.hibernate.Session;
 
 import java.util.List;
 
-@RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
-    private final UserDao userDao;
-
     @Override
-    public void createUser(User user) {
-        userDao.createUser(user);
+    public User saveUser(User user) {
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            HibernateUtil.performTransaction(session, s -> s.persist(user));
+        }
+
+        return user;
     }
 
     @Override
-    public User getUserById(int userId) {
-        return userDao.getUserById(userId);
+    public User updateUser(User user) {
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            HibernateUtil.performTransaction(session, s -> s.merge(user));
+        }
+
+        return user;
+    }
+
+    @Override
+    public void deleteUser(User user) {
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            HibernateUtil.performTransaction(session, s -> s.remove(user));
+        }
+    }
+
+    @Override
+    public User getUserById(Integer userId) {
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            return session.get(User.class, userId);
+        }
     }
 
     @Override
     public List<User> getAllUsers() {
-        return userDao.getAllUsers();
-    }
-
-    @Override
-    public void updateUser(User user) {
-        userDao.updateUser(user);
-    }
-
-    @Override
-    public void deleteUser(int id) {
-        userDao.deleteUser(id);
-    }
-
-    @Override
-    public void displayUsers(List<User> users) {
-        System.out.println("All users: ");
-        for (User user : users) {
-            System.out.println(user);
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            return session.createQuery("FROM User", User.class).list();
         }
     }
 

@@ -1,27 +1,27 @@
 package com.phonebook.service;
 
-import com.phonebook.model.Company;
+import com.phonebook.entity.Company;
 
 import java.util.List;
 
 public interface CompanyService {
-    void createCompany(Company company);
+    Company saveCompany(Company company);
 
-    Company getCompanyById(int id);
+    Company updateCompany(Company company);
+
+    void deleteCompany(Company company);
+
+    Company getCompanyById(Integer companyId);
 
     List<Company> getAllCompanies();
 
-    void updateCompany(Company company);
-
-    void deleteCompany(int id);
-
-    void displayCompanies(List<Company> companies);
-
     static Company buildCompany(String name, String address, String phoneNumber) {
-        return Company.builder()
-                .name(name)
-                .address(address)
-                .phoneNumber(phoneNumber)
-                .build();
+        Company newCompany = new Company();
+
+        newCompany.setName(name);
+        newCompany.setAddress(address);
+        newCompany.setPhoneNumber(phoneNumber);
+
+        return newCompany;
     }
 }

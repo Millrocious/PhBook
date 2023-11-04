@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<hibernate-mapping>
+    <class name="com.phonebook.entity.Company" table="companies">
+        <id name="id" type="int" column="id"><generator class="native"/></id>
+        <property name="name" type="string" column="name" not-null="true"/>
+        <property name="address" type="string" column="address" not-null="true"/>
+        <property name="phoneNumber" type="string" column="phone_number" not-null="true" unique="true"/>
+
+        <set name="users" table="users" inverse="true" lazy="true" fetch="select" cascade="all">
+            <key>
+                <column name="company_id" not-null="true"/>
+            </key>
+            <one-to-many class="com.phonebook.entity.User"/>
+        </set>
+    </class>
+</hibernate-mapping>

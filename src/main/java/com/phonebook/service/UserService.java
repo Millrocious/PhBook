@@ -1,27 +1,29 @@
 package com.phonebook.service;
 
-import com.phonebook.model.User;
+import com.phonebook.entity.Company;
+import com.phonebook.entity.User;
 
 import java.util.List;
 
 public interface UserService {
-    void createUser(User user);
+    User saveUser(User user);
 
-    User getUserById(int userId);
+    User updateUser(User user);
+
+    void deleteUser(User user);
+
+    User getUserById(Integer userId);
 
     List<User> getAllUsers();
 
-    void updateUser(User user);
+    static User buildUser(String firstName, String lastName, String phoneNumber, Company company) {
+        User newUser = new User();
 
-    void deleteUser(int id);
+        newUser.setFirstName(firstName);
+        newUser.setLastName(lastName);
+        newUser.setPhoneNumber(phoneNumber);
+        newUser.setCompany(company);
 
-    void displayUsers(List<User> users);
-
-    static User buildUser(String firstName, String lastName, String phoneNumber) {
-        return User.builder()
-                .firstName(firstName)
-                .lastName(lastName)
-                .phoneNumber(phoneNumber)
-                .build();
+        return newUser;
     }
 }

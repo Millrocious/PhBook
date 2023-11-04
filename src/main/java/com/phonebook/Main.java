@@ -1,98 +1,77 @@
 package com.phonebook;
 
-import com.phonebook.dao.CompanyDao;
-import com.phonebook.dao.UserDao;
-import com.phonebook.model.Company;
-import com.phonebook.model.User;
+import com.phonebook.entity.Company;
+import com.phonebook.entity.User;
 import com.phonebook.service.CompanyService;
 import com.phonebook.service.UserService;
 import com.phonebook.service.impl.CompanyServiceImpl;
 import com.phonebook.service.impl.UserServiceImpl;
-import com.phonebook.util.JdbcUtil;
-
-import java.sql.Connection;
-import java.util.List;
+import com.phonebook.util.HibernateUtil;
 
 public class Main {
     public static void main(String[] args) {
-        JdbcUtil.init();
+        UserService userService = new UserServiceImpl();
+        CompanyService companyService = new CompanyServiceImpl();
 
-        try (Connection connection = JdbcUtil.getConnection()) {
-            // Users
-            UserDao userDao = new UserDao(connection);
-            UserService userService = new UserServiceImpl(userDao);
 
-            // Build user
-            User newUser = UserService.buildUser("Max", "Shell", "123-123-1234");
-            User newUser2 = UserService.buildUser("Levi", "Muller", "988-777-6666");
+        Company newCompany = CompanyService.buildCompany("Example Corp", "23 Main St", "555-123-4567");
+        Company newCompany2 = CompanyService.buildCompany("Example Corp test 2", "67 Main St", "666-123-9876");
+        // Create company
+        Company savedCompany = companyService.saveCompany(newCompany);
+        Company savedCompany2 = companyService.saveCompany(newCompany2);
 
-            // Create user
-            userService.createUser(newUser);
-            userService.createUser(newUser2);
+        User newUser = UserService.buildUser("Max", "Shell", "123-123-1234", newCompany);
+        User newUser2 = UserService.buildUser("Levi", "Muller", "988-777-6666", newCompany);
 
-            // Get user
-            User retrievedUser = userService.getUserById(3);
-            System.out.println("Retrieved user: " + retrievedUser);
+        // Create user
+        User savedUser = userService.saveUser(newUser);
+        User savedUser2 = userService.saveUser(newUser2);
 
-            User retrievedUser2 = userService.getUserById(4);
-            System.out.println("Retrieved user: " + retrievedUser2);
+        // Get user
+        User retrievedUser = userService.getUserById(savedUser.getId());
+        System.out.println("Retrieved user: " + retrievedUser);
 
-            // Get users
-            List<User> allUsers = userService.getAllUsers();
-            userService.displayUsers(allUsers);
+        User retrievedUser2 = userService.getUserById(savedUser2.getId());
+        System.out.println("Retrieved user: " + retrievedUser2);
 
-            // Update user
-            retrievedUser.setPhoneNumber("555-999-8888");
-            userService.updateUser(retrievedUser);
-            System.out.println("Updated user: " + retrievedUser);
+        // Get users
+        System.out.println("List of all users");
+        userService.getAllUsers().forEach(System.out::println);
 
-            // Delete user
-            int userIdToDelete = 4;
-            userService.deleteUser(userIdToDelete);
-            System.out.println("Deleted user with ID " + userIdToDelete);
+        // Update user
+        retrievedUser.setPhoneNumber("555-999-8888");
+        User updatedUser = userService.updateUser(retrievedUser);
+        System.out.println("Updated user: " + updatedUser);
 
-            userService.displayUsers(userService.getAllUsers());
+        // Delete user
+        userService.deleteUser(retrievedUser2);
+        System.out.println("User deleted");
 
-            // ---------
-            // Companies
-            CompanyDao companyDao = new CompanyDao(connection);
-            CompanyService companyService = new CompanyServiceImpl(companyDao);
+        userService.getAllUsers().forEach(System.out::println);
 
-            // Build company
-            Company newCompany = CompanyService.buildCompany("Example Corp", "23 Main St", "555-123-4567");
-            Company newCompany2 = CompanyService.buildCompany("Example Corp test 2", "67 Main St", "666-123-9876");
+        // Get Company
+        Company retrievedCompany = companyService.getCompanyById(savedCompany.getId());
+        System.out.println("Retrieved company: " + retrievedCompany);
 
-            // Create company
-            companyService.createCompany(newCompany);
-            companyService.createCompany(newCompany2);
+        Company retrievedCompany2 = companyService.getCompanyById(savedCompany2.getId());
+        System.out.println("Retrieved company: " + retrievedCompany2);
 
-            // Get Company
-            Company retrievedCompany = companyService.getCompanyById(3);
-            System.out.println("Retrieved company: " + retrievedCompany);
+        // Get companies
+        System.out.println("List of all companies");
+        companyService.getAllCompanies().forEach(System.out::println);
 
-            Company retrievedCompany2 = companyService.getCompanyById(4);
-            System.out.println("Retrieved company: " + retrievedCompany2);
+        // Update company
+        retrievedCompany.setPhoneNumber("555-999-8888");
+        Company updatedCompany = companyService.updateCompany(retrievedCompany);
+        System.out.println("Updated company: " + updatedCompany);
 
-            // Get companies
-            List<Company> allCompanies = companyService.getAllCompanies();
-            companyService.displayCompanies(companyService.getAllCompanies());
+        // Delete company
+        companyService.deleteCompany(retrievedCompany2);
+        System.out.println("Company deleted");
 
-            // Update company
-            retrievedCompany.setPhoneNumber("555-999-8888");
-            companyService.updateCompany(retrievedCompany);
-            System.out.println("Updated company: " + retrievedCompany);
+        companyService.getAllCompanies().forEach(System.out::println);
 
-            // Delete company
-            int companyIdToDelete = 4;
-            companyService.deleteCompany(companyIdToDelete);
-            System.out.println("Deleted company with ID " + companyIdToDelete);
 
-            companyService.displayCompanies(companyService.getAllCompanies());
-
-        } catch (Exception e) {
-            System.out.println(e);
-        }
-
-        JdbcUtil.clearData();
+        HibernateUtil.shutdown();
     }
 }
