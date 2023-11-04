@@ -3,6 +3,7 @@ package com.phonebook.service.impl;
 import com.phonebook.entity.Company;
 import com.phonebook.service.CompanyService;
 import com.phonebook.util.HibernateUtil;
+import org.hibernate.Hibernate;
 import org.hibernate.Session;
 
 import java.util.List;
@@ -36,14 +37,21 @@ public class CompanyServiceImpl implements CompanyService {
     @Override
     public Company getCompanyById(Integer companyId) {
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            return session.get(Company.class, companyId);
+            Company company = session.get(Company.class, companyId);
+
+            Hibernate.initialize(company.getUsers());
+
+            return company;
         }
     }
 
     @Override
     public List<Company> getAllCompanies() {
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            return session.createQuery("FROM Company", Company.class).list();
+            return session.createQuery(
+                    "SELECT c FROM Company c LEFT JOIN FETCH c.users",
+                    Company.class
+            ).list();
         }
     }
 }
